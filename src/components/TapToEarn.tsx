@@ -52,14 +52,17 @@ export default function TapToEarn() {
   // }
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>Tap to Earn</h1>
-      <p>Bonjour, {user}!</p>
-      <p>Énergie : {energy}%</p>
-      <p>Points : {points}</p>
-      <button onClick={handleTap} disabled={energy === 0}>
-        Taper sur le personnage
-      </button>
-    </div>
+      <div style={{
+        height: '100vh',
+        width: '100vw',
+      }}>
+        <h1>Greeniz</h1>
+        <p>Bonjour {user}!</p>
+        <p>Énergie : {energy}%</p>
+        <p>Points : {points}</p>
+        <button onClick={handleTap} disabled={energy === 0}>
+          Taper sur le personnage
+        </button>
+      </div>
   );
 }
