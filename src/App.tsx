@@ -1,8 +1,8 @@
-import RockPaperScissors from "./components/RockPaperScissors"
+import TapToEarn from "./components/TapToEarn"
 
 function App() {
   return (
-    <RockPaperScissors />
+    <TapToEarn />
   )
 }
 
