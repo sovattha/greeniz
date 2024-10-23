@@ -7,15 +7,15 @@ export default function TapToEarn() {
   const [user, setUser] = useState<string | null>(null);
 
   useEffect(() => {
-    const tg = (window as unknown as { Telegram: { WebApp: { initDataUnsafe: { user: string } } }}).Telegram.WebApp;
-    const userData = tg.initDataUnsafe.user;
-
-    if (userData) {
-      setUser(userData);
-
-      // TODO Charger l'état initial depuis le backend
-
-    }
+    // const tg = (window as unknown as { Telegram: { WebApp: { initDataUnsafe: { user: string } } }}).Telegram.WebApp;
+    // const userData = tg.initDataUnsafe.user;
+    //
+    // if (userData) {
+    //   setUser(userData);
+    //
+    //   // TODO Charger l'état initial depuis le backend
+    //
+    // }
   }, []);
 
   useEffect(() => {
@@ -53,8 +53,8 @@ export default function TapToEarn() {
 
   return (
       <div style={{
-        height: '100vh',
         width: '100vw',
+        textAlign: 'center',
       }}>
         <h1>Greeniz</h1>
         <p>Bonjour {user}!</p>
