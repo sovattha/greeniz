@@ -18,52 +18,57 @@ export default function TapToEarn() {
     // Votre code existant pour la gestion de l'énergie
   }, [lastTapTime]);
 
-  const handleTap = () => {
-    if (energy > 0) {
-      const newPoints = points + 1;
-      setEnergy(energy - 1);
-      setPoints(newPoints);
-      setLastTapTime(Date.now());
+  const handleTap = (event: { preventDefault: () => void; }) => {
+    event.preventDefault(); // Empêche le comportement par défaut de l'événement
 
-      // Déclencher l'animation de rebond
-      characterAnimation.start({
-        scale: [1, 1.2, 1],
-        transition: { duration: 0.3 },
+    setEnergy((prevEnergy) => {
+      if (prevEnergy > 0) {
+        return prevEnergy - 1;
+      } else {
+        alert('Votre énergie est vide ! Revenez plus tard.');
+        return prevEnergy;
+      }
+    });
+
+    setPoints((prevPoints) => prevPoints + 1);
+    setLastTapTime(Date.now());
+
+    // Déclencher l'animation de rebond
+    characterAnimation.start({
+      scale: [1, 1.2, 1],
+      transition: { duration: 0.3 },
+    });
+
+    // Générer les feuilles seulement si elles ne tombent pas déjà
+    if (!isLeavesFalling) {
+      setIsLeavesFalling(true);
+
+      // Générer les feuilles avec variations aléatoires
+      const newLeaves = Array.from({ length: 10 }).map(() => {
+        const delay = Math.random() * 0.5;
+        const duration = Math.random() * 1 + 1.5;
+        const fadeInEnd = Math.random() * 0.1 + 0.05;
+        const fadeOutStart = Math.random() * 0.1 + 0.85;
+
+        return {
+          id: Math.random(),
+          x: Math.random() * 200 - 100,
+          delay,
+          duration,
+          rotation: Math.random() * 360,
+          size: Math.random() * 30 + 20,
+          fadeInEnd,
+          fadeOutStart,
+        };
       });
 
-      // Générer les feuilles seulement si elles ne tombent pas déjà
-      if (!isLeavesFalling) {
-        setIsLeavesFalling(true);
+      setLeaves(newLeaves);
 
-        // Générer les feuilles avec variations aléatoires
-        const newLeaves = Array.from({ length: 10 }).map(() => {
-          const delay = Math.random() * 0.5;
-          const duration = Math.random() * 1 + 1.5;
-          const fadeInEnd = Math.random() * 0.1 + 0.05;
-          const fadeOutStart = Math.random() * 0.1 + 0.85;
-
-          return {
-            id: Math.random(),
-            x: Math.random() * 200 - 100,
-            delay,
-            duration,
-            rotation: Math.random() * 360,
-            size: Math.random() * 30 + 20,
-            fadeInEnd,
-            fadeOutStart,
-          };
-        });
-
-        setLeaves(newLeaves);
-
-        // Supprimer les feuilles après l'animation
-        setTimeout(() => {
-          setLeaves([]);
-          setIsLeavesFalling(false);
-        }, 3000);
-      }
-    } else {
-      alert('Votre énergie est vide ! Revenez plus tard.');
+      // Supprimer les feuilles après l'animation
+      setTimeout(() => {
+        setLeaves([]);
+        setIsLeavesFalling(false);
+      }, 3000);
     }
   };
 
@@ -118,9 +123,14 @@ export default function TapToEarn() {
         </div>
         <div style={{ position: 'relative', display: 'inline-block' }}>
           <motion.img
-            style={{ maxWidth: '100vw', cursor: 'pointer', zIndex: 10, position: 'relative' }}
+            style={{
+              maxWidth: '100vw',
+              cursor: 'pointer',
+              zIndex: 10,
+              position: 'relative',
+            }}
             src="character.png"
-            onClick={handleTap}
+            onPointerDown={handleTap} // Utiliser onPointerDown pour une meilleure réactivité
             animate={characterAnimation}
           />
           <AnimatePresence>
