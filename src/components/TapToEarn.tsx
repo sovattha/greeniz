@@ -5,7 +5,6 @@ export default function TapToEarn() {
   const [energy, setEnergy] = useState(100);
   const [points, setPoints] = useState(0);
   const [lastTapTime, setLastTapTime] = useState<number | null>(null);
-  // const [user, setUser] = useState<string | null>(null);
   const [leaves, setLeaves] = useState<any[]>([]);
   const [isLeavesFalling, setIsLeavesFalling] = useState(false);
 
@@ -21,6 +20,18 @@ export default function TapToEarn() {
 
   const handleTap = () => {
     if (energy > 0) {
+      const newPoints = points + 1;
+      setEnergy(energy - 1);
+      setPoints(newPoints);
+      setLastTapTime(Date.now());
+
+      // Déclencher l'animation de rebond
+      characterAnimation.start({
+        scale: [1, 1.2, 1],
+        transition: { duration: 0.3 },
+      });
+
+      // Générer les feuilles seulement si elles ne tombent pas déjà
       if (!isLeavesFalling) {
         setIsLeavesFalling(true);
 
@@ -51,17 +62,6 @@ export default function TapToEarn() {
           setIsLeavesFalling(false);
         }, 3000);
       }
-
-      const newPoints = points + 1;
-      setEnergy(energy - 1);
-      setPoints(newPoints);
-      setLastTapTime(Date.now());
-
-      // Déclencher l'animation de rebond
-      characterAnimation.start({
-        scale: [1, 1.2, 1],
-        transition: { duration: 0.3 },
-      });
     } else {
       alert('Votre énergie est vide ! Revenez plus tard.');
     }
@@ -118,7 +118,7 @@ export default function TapToEarn() {
         </div>
         <div style={{ position: 'relative', display: 'inline-block' }}>
           <motion.img
-            style={{ maxWidth: '100vw', cursor: 'pointer', zIndex: 2 }}
+            style={{ maxWidth: '100vw', cursor: 'pointer', zIndex: 10, position: 'relative' }}
             src="character.png"
             onClick={handleTap}
             animate={characterAnimation}
@@ -136,7 +136,7 @@ export default function TapToEarn() {
                   width: `${leaf.size}px`,
                   rotate: leaf.rotation,
                   pointerEvents: 'none',
-                  zIndex: 1,
+                  zIndex: 5,
                 }}
                 initial={{ y: 50, opacity: 0, scale: 0.8 }}
                 animate={{
