@@ -4,26 +4,53 @@ import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 export default function TapToEarn() {
   const [energy, setEnergy] = useState(100);
   const [points, setPoints] = useState(0);
-  const [lastTapTime, setLastTapTime] = useState<number | null>(null);
+  const [lastEnergyUpdateTime, setLastEnergyUpdateTime] = useState<number | null>(null);
   const [leaves, setLeaves] = useState<any[]>([]);
   const [isLeavesFalling, setIsLeavesFalling] = useState(false);
 
   const characterAnimation = useAnimation();
 
-  useEffect(() => {
-    // Votre code existant pour l'initialisation
-  }, []);
+  // Constants
+  const MAX_ENERGY = 100;
+  const REFILL_TIME_MS = 4 * 60 * 60 * 1000; // 4 heures en millisecondes
 
   useEffect(() => {
-    // Votre code existant pour la gestion de l'énergie
-  }, [lastTapTime]);
+    // Mettre à jour l'énergie en fonction du temps écoulé
+    const updateEnergy = () => {
+      setEnergy((prevEnergy) => {
+        if (prevEnergy >= MAX_ENERGY) {
+          return MAX_ENERGY;
+        }
+
+        const now = Date.now();
+        const lastUpdate = lastEnergyUpdateTime || now;
+        const elapsedTime = now - lastUpdate;
+
+        const energyRecovered = (elapsedTime / REFILL_TIME_MS) * MAX_ENERGY;
+        const newEnergy = Math.min(prevEnergy + energyRecovered, MAX_ENERGY);
+
+        // Mettre à jour le temps du dernier ajustement d'énergie
+        setLastEnergyUpdateTime(now);
+
+        return newEnergy;
+      });
+    };
+
+    // Mettre à jour l'énergie immédiatement et ensuite à intervalles réguliers
+    updateEnergy();
+    const interval = setInterval(updateEnergy, 60000); // Toutes les minutes
+
+    return () => clearInterval(interval);
+  }, [lastEnergyUpdateTime]);
 
   const handleTap = (event: { preventDefault: () => void; }) => {
     event.preventDefault(); // Empêche le comportement par défaut de l'événement
 
     setEnergy((prevEnergy) => {
       if (prevEnergy > 0) {
-        return prevEnergy - 1;
+        const newEnergy = prevEnergy - 1;
+        setLastEnergyUpdateTime(Date.now()); // Mettre à jour le temps du dernier ajustement d'énergie
+        return newEnergy;
       } else {
         alert('Votre énergie est vide ! Revenez plus tard.');
         return prevEnergy;
@@ -31,7 +58,6 @@ export default function TapToEarn() {
     });
 
     setPoints((prevPoints) => prevPoints + 1);
-    setLastTapTime(Date.now());
 
     // Déclencher l'animation de rebond
     characterAnimation.start({
@@ -130,7 +156,7 @@ export default function TapToEarn() {
               position: 'relative',
             }}
             src="character.png"
-            onPointerDown={handleTap} // Utiliser onPointerDown pour une meilleure réactivité
+            onPointerDown={handleTap}
             animate={characterAnimation}
           />
           <AnimatePresence>
