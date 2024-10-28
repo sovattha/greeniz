@@ -147,60 +147,84 @@ export default function TapToEarn() {
         >
           Points: {points}
         </div>
-        <div style={{ position: 'relative', display: 'inline-block' }}>
-          <motion.img
-            style={{
-              maxWidth: '100vw',
-              cursor: 'pointer',
-              zIndex: 10,
-              position: 'relative',
-            }}
-            src="character.png"
-            onPointerDown={handleTap}
-            animate={characterAnimation}
-          />
-          <AnimatePresence>
-            {leaves.map((leaf) => (
+          <div style={{position: 'relative', display: 'inline-block'}}>
               <motion.img
-                key={leaf.id}
-                src="leaf.png"
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: '50%',
-                  x: leaf.x,
-                  width: `${leaf.size}px`,
-                  rotate: leaf.rotation,
-                  pointerEvents: 'none',
-                  zIndex: 5,
-                }}
-                initial={{ y: 50, opacity: 0, scale: 0.8 }}
-                animate={{
-                  y: 300,
-                  opacity: [0, 1, 1, 0],
-                  rotate: leaf.rotation + 360,
-                  scale: 1,
-                }}
-                exit={{ opacity: 0 }}
-                transition={{
-                  y: { duration: leaf.duration, ease: 'easeInOut', delay: leaf.delay },
-                  rotate: { duration: leaf.duration, ease: 'linear', delay: leaf.delay },
-                  opacity: {
-                    duration: leaf.duration,
-                    ease: 'easeInOut',
-                    delay: leaf.delay,
-                    times: [0, leaf.fadeInEnd, leaf.fadeOutStart, 1],
-                  },
-                  scale: {
-                    duration: leaf.duration * leaf.fadeInEnd,
-                    ease: 'easeOut',
-                    delay: leaf.delay,
-                  },
-                }}
+                  style={{
+                      maxWidth: '100vw',
+                      cursor: 'pointer',
+                      zIndex: 10,
+                      position: 'relative',
+                  }}
+                  src="globe.png"
+                  onPointerDown={handleTap}
+                  animate={characterAnimation}
               />
-            ))}
-          </AnimatePresence>
-        </div>
+              <motion.img
+                  style={{
+                      maxWidth: '10vw',
+                      cursor: 'pointer',
+                      zIndex: 11,
+                      position: 'absolute',
+                      top: 0,
+                      left: '30%',
+                  }}
+                  src="character-2.png"
+                  animate={characterAnimation}
+              />
+              <motion.img
+                  style={{
+                      maxWidth: '10vw',
+                      cursor: 'pointer',
+                      zIndex: 11,
+                      position: 'absolute',
+                      top: 0,
+                      left: '40%',
+                  }}
+                  src="character-3.png"
+                  animate={characterAnimation}
+              />
+              <AnimatePresence>
+                  {leaves.map((leaf) => (
+                      <motion.img
+                          key={leaf.id}
+                          src="leaf.png"
+                          style={{
+                              position: 'absolute',
+                              top: 0,
+                              left: '70%',
+                              x: leaf.x,
+                              width: `${leaf.size}px`,
+                              rotate: leaf.rotation,
+                              pointerEvents: 'none',
+                              zIndex: 12,
+                          }}
+                          initial={{y: 50, opacity: 0, scale: 0.8}}
+                          animate={{
+                              y: 300,
+                              opacity: [0, 1, 1, 0],
+                              rotate: leaf.rotation + 360,
+                              scale: 1,
+                          }}
+                          exit={{opacity: 0}}
+                          transition={{
+                              y: {duration: leaf.duration, ease: 'easeInOut', delay: leaf.delay},
+                              rotate: {duration: leaf.duration, ease: 'linear', delay: leaf.delay},
+                              opacity: {
+                                  duration: leaf.duration,
+                                  ease: 'easeInOut',
+                                  delay: leaf.delay,
+                                  times: [0, leaf.fadeInEnd, leaf.fadeOutStart, 1],
+                              },
+                              scale: {
+                                  duration: leaf.duration * leaf.fadeInEnd,
+                                  ease: 'easeOut',
+                                  delay: leaf.delay,
+                              },
+                          }}
+                      />
+                  ))}
+              </AnimatePresence>
+          </div>
       </div>
     </>
   );
