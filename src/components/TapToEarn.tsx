@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
+import axios from 'axios';
 
 export default function TapToEarn() {
   const [energy, setEnergy] = useState(100);
@@ -7,6 +8,27 @@ export default function TapToEarn() {
   const [lastEnergyUpdateTime, setLastEnergyUpdateTime] = useState<number | null>(null);
   const [leaves, setLeaves] = useState<any[]>([]);
   const [isLeavesFalling, setIsLeavesFalling] = useState(false);
+  const [initData, setInitData] = useState('');
+
+  useEffect(() => {
+    // Récupérer les données d'initialisation de Telegram
+    const tg = window.Telegram.WebApp;
+    const initData = tg.initData || 12345678;
+    setInitData(initData);
+
+    // Charger les données utilisateur depuis le backend
+    axios
+      .get('/api/get-user', { params: { initData } })
+      .then((response) => {
+        const { points, energy, lastTapTime } = response.data;
+        setPoints(points);
+        setEnergy(energy);
+        setLastEnergyUpdateTime(new Date(lastTapTime).getTime());
+      })
+      .catch((error) => {
+        console.error('Erreur lors du chargement des données utilisateur', error);
+      });
+  }, []);
 
   const characterAnimation = useAnimation();
 
@@ -15,33 +37,34 @@ export default function TapToEarn() {
   const REFILL_TIME_MS = 4 * 60 * 60 * 1000; // 4 heures en millisecondes
 
   useEffect(() => {
-    // Mettre à jour l'énergie en fonction du temps écoulé
-    const updateEnergy = () => {
-      setEnergy((prevEnergy) => {
-        if (prevEnergy >= MAX_ENERGY) {
-          return MAX_ENERGY;
-        }
+      // Mettre à jour l'énergie en fonction du temps écoulé
+      const updateEnergy = () => {
+        setEnergy((prevEnergy) => {
+          if (prevEnergy >= MAX_ENERGY) {
+            return MAX_ENERGY;
+          }
 
-        const now = Date.now();
-        const lastUpdate = lastEnergyUpdateTime || now;
-        const elapsedTime = now - lastUpdate;
+          const now = Date.now();
+          const lastUpdate = lastEnergyUpdateTime || now;
+          const elapsedTime = now - lastUpdate;
 
-        const energyRecovered = (elapsedTime / REFILL_TIME_MS) * MAX_ENERGY;
-        const newEnergy = Math.min(prevEnergy + energyRecovered, MAX_ENERGY);
+          const energyRecovered = (elapsedTime / REFILL_TIME_MS) * MAX_ENERGY;
+          const newEnergy = Math.min(prevEnergy + energyRecovered, MAX_ENERGY);
+
+          return newEnergy;
+        });
 
         // Mettre à jour le temps du dernier ajustement d'énergie
-        setLastEnergyUpdateTime(now);
+        setLastEnergyUpdateTime(Date.now());
+      };
 
-        return newEnergy;
-      });
-    };
+      // Mettre à jour l'énergie immédiatement et ensuite à intervalles réguliers
+      updateEnergy();
+      const interval = setInterval(updateEnergy, 60000); // Toutes les minutes
 
-    // Mettre à jour l'énergie immédiatement et ensuite à intervalles réguliers
-    updateEnergy();
-    const interval = setInterval(updateEnergy, 60000); // Toutes les minutes
+      return () => clearInterval(interval);
+    }, []);
 
-    return () => clearInterval(interval);
-  }, [lastEnergyUpdateTime]);
 
   const handleTap = (event: { preventDefault: () => void; }) => {
     event.preventDefault(); // Empêche le comportement par défaut de l'événement
@@ -50,6 +73,12 @@ export default function TapToEarn() {
       if (prevEnergy > 0) {
         const newEnergy = prevEnergy - 1;
         setLastEnergyUpdateTime(Date.now()); // Mettre à jour le temps du dernier ajustement d'énergie
+        axios.post('/api/update-user', {
+          initData,
+          energy,
+          points,
+          lastTapTime: Date.now(),
+        });
         return newEnergy;
       } else {
         alert('Votre énergie est vide ! Revenez plus tard.');

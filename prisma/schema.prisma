@@ -1,0 +1,16 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  telegramId  String   @unique
+  points      Int      @default(50) // Définissez ici le nombre de points initiaux souhaité
+  energy      Float    @default(100) // Assurez-vous que l'énergie par défaut est à 100
+  lastTapTime DateTime @default(now())
+}
