@@ -112,7 +112,6 @@ export default function TapToEarn() {
           paddingTop: 40,
           overflow: 'hidden',
           position: 'relative',
-          fontFamily: '"Press Start 2P", cursive',
           color: '#fff',
         }}
       >
